@@ -1,0 +1,34 @@
+
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+qrcli       # if you build a binary named qrcli
+
+# Output files
+output.png
+
+# Go build artifacts
+*.test
+*.out
+
+# Vendor directory (if you vendor dependencies)
+vendor/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# IDE/editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
