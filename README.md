@@ -23,8 +23,7 @@ The app collects user information and generates a QR code as a PNG.
 - Go 1.21+
 - Terminal capable of displaying UTF-8 (for ASCII QR)
 - Generate your own gopher here: https://gopherize.me/
-   - Save it to `imgs/default.png` in the working directory (transparent background recommended)
-
+   - Save it to `imgs/default.png` in the working directory.
 ### Install
 
 ```bash
