@@ -97,7 +97,7 @@ The app is structured using **The Elm Architecture** via Bubble Tea:
 
 ```
 qr_gopher/
-|imgs/              # Overlay mascot png file(s) go Interactive
+|imgs/              # Overlay mascot png file(s)
 ├── main.go         # Bubble Tea CLI app
 ├── output.png      # Generated QR (after running)
 └── README.md       # Documentation
