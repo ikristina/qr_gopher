@@ -5,7 +5,6 @@ go 1.25.1
 require (
 	github.com/charmbracelet/bubbles v0.21.0
 	github.com/charmbracelet/bubbletea v1.3.10
-	github.com/mdp/qrterminal/v3 v3.2.1
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 )
 
@@ -28,7 +27,5 @@ require (
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	golang.org/x/sys v0.36.0 // indirect
-	golang.org/x/term v0.13.0 // indirect
 	golang.org/x/text v0.3.8 // indirect
-	rsc.io/qr v0.2.0 // indirect
 )

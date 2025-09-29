@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"image"
+	"image/color"
 	"image/draw"
 	"image/png"
 	"os"
@@ -10,7 +11,6 @@ import (
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
-	qrterminal "github.com/mdp/qrterminal/v3"
 	"github.com/skip2/go-qrcode"
 )
 
@@ -91,10 +91,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.err = err
 					return m, tea.Quit
 				}
+				qr.DisableBorder = false
 				qrImg := qr.Image(512) // QR code as image
 
 				// load gopher
-				gopherFile, err := os.Open("imgs/gopher_kristina.png")
+				gopherFile, err := os.Open("imgs/default.png")
 				if err != nil {
 					m.err = err
 					return m, tea.Quit
@@ -113,11 +114,41 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				gopherH := int(float64(qrImg.Bounds().Dy()) * scale)
 				resized := resizeImage(gopherImg, gopherW, gopherH)
 
-				// put gopher on top of the qr code
-				out := image.NewRGBA(qrImg.Bounds())
-				draw.Draw(out, qrImg.Bounds(), qrImg, image.Point{}, draw.Src)
-				offset := image.Pt((qrImg.Bounds().Dx()-gopherW)/2, (qrImg.Bounds().Dy()-gopherH)/2)
-				draw.Draw(out, resized.Bounds().Add(offset), resized, image.Point{}, draw.Over)
+				// Create circular mask
+                mask := image.NewAlpha(resized.Bounds())
+                cx, cy := resized.Bounds().Dx()/2, resized.Bounds().Dy()/2
+                radius := cx
+                for y := 0; y < resized.Bounds().Dy(); y++ {
+                    for x := 0; x < resized.Bounds().Dx(); x++ {
+                        dx := x - cx
+                        dy := y - cy
+                        if dx*dx+dy*dy <= radius*radius {
+                            mask.SetAlpha(x, y, color.Alpha{A: 255}) // opaque inside circle
+                        } else {
+                            mask.SetAlpha(x, y, color.Alpha{A: 0}) // transparent outside
+                        }
+                    }
+                }
+
+                circularGopher := image.NewRGBA(resized.Bounds())
+				draw.DrawMask(circularGopher, resized.Bounds(), resized, image.Point{}, mask, image.Point{}, draw.Over)
+
+                // Prepare output image
+                out := image.NewRGBA(qrImg.Bounds())
+                draw.Draw(out, qrImg.Bounds(), qrImg, image.Point{}, draw.Src)
+
+                offset := image.Pt(
+                    (qrImg.Bounds().Dx()-resized.Bounds().Dx())/2,
+                    (qrImg.Bounds().Dy()-resized.Bounds().Dy())/2,
+                )
+
+                // Draw circular white background using mask
+                white := image.NewUniform(color.White)
+                draw.DrawMask(out, resized.Bounds().Add(offset), white, image.Point{}, mask, image.Point{}, draw.Over)
+
+                // Draw circular gopher on top
+                draw.Draw(out, circularGopher.Bounds().Add(offset), circularGopher, image.Point{}, draw.Over)
+
 
 				// save png
 				outFile, err := os.Create("output.png")
@@ -130,11 +161,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.err = err
 					return m, tea.Quit
 				}
-
-				// terminal output
-				var sb strings.Builder
-				qrterminal.GenerateHalfBlock(content, qrterminal.H, os.Stdout) // H - high quality level / error correction.
-				m.qrASCII = sb.String()
 
 				return m, tea.Quit
 			}
@@ -176,6 +202,34 @@ func resizeImage(img image.Image, width, height int) *image.RGBA {
 	}
 	return dst
 }
+
+func circularMask(img image.Image) *image.RGBA {
+    bounds := img.Bounds()
+    w, h := bounds.Dx(), bounds.Dy()
+    out := image.NewRGBA(bounds)
+
+    cx, cy := w/2, h/2
+    radius := w/2
+    if h < w {
+        radius = h / 2
+    }
+
+    for y := 0; y < h; y++ {
+        for x := 0; x < w; x++ {
+            dx := x - cx
+            dy := y - cy
+            if dx*dx+dy*dy <= radius*radius {
+                // Copy pixel if inside circle
+                out.Set(x, y, img.At(x, y))
+            } else {
+                // Transparent outside
+                out.Set(x, y, color.RGBA{0, 0, 0, 0})
+            }
+        }
+    }
+    return out
+}
+
 
 func main() {
 	p := tea.NewProgram(initialModel())

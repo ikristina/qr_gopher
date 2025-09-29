@@ -2,7 +2,7 @@
 
 A command-line tool to generate QR codes with a gopher mascot overlay, written in Go using [Bubble Tea](https://github.com/charmbracelet/bubbletea) for interactive input.
 
-The app collects user information, generates a QR code as a PNG, and optionally prints an ASCII version in the terminal.
+The app collects user information and generates a QR code as a PNG.
 
 ---
 
@@ -12,9 +12,7 @@ The app collects user information, generates a QR code as a PNG, and optionally 
 - Collects **Name**, **Site**, and **Notes**
 - Generates a **512×512 PNG QR code**
 - Overlays a **gopher image** at the center
-- Prints **terminal ASCII QR** for immediate scanning
 - High error correction ensures QR remains scannable even with an overlay
-- Cross-platform: works on Linux, macOS, and Windows
 
 ---
 
@@ -24,13 +22,14 @@ The app collects user information, generates a QR code as a PNG, and optionally 
 
 - Go 1.21+
 - Terminal capable of displaying UTF-8 (for ASCII QR)
-- `gopher.png` in the working directory (transparent background recommended)
+- Generate your own gopher here: https://gopherize.me/
+   - Save it to `imgs/default.png` in the working directory (transparent background recommended)
 
 ### Install
 
 ```bash
-git clone https://github.com/yourusername/qr-cli
-cd qr-cli
+git clone https://github.com/ikristina
+cd qr_gopher
 go build -o qrcli
 ```
 
@@ -49,7 +48,6 @@ Run the CLI:
 3. Enter optional **notes**
 4. After the last input, the program generates:
    - `output.png` with the QR code and gopher overlay
-   - Terminal ASCII QR code
 
 Example output:
 
@@ -57,6 +55,8 @@ Example output:
 QR code generated → output.png
 
 ```
+
+![outputQR]("output.png")
 
 ---
 
@@ -92,39 +92,15 @@ The app is structured using **The Elm Architecture** via Bubble Tea:
 - Gopher is resized to **25% of QR size** and placed at the center.
 - High error correction (`qrcode.Highest` in PNG, `qrterminal.H` in ASCII) ensures scannability even with the overlay.
 
----
-
-### Terminal QR
-
-- Uses [`mdp/qrterminal/v3`](https://github.com/mdp/qrterminal)
-- Generates a half-block ASCII QR code (`▄`) with high error correction
-- Displayed directly in the terminal for quick scanning
 
 ---
 
 ### File Structure
 
 ```
-qr-cli/
+qr_gopher/
+|imgs/              # Overlay mascot png file(s) go Interactive
 ├── main.go         # Bubble Tea CLI app
-├── gopher.png      # Overlay mascot
 ├── output.png      # Generated QR (after running)
 └── README.md       # Documentation
 ```
-
----
-
-### Future Enhancements
-
-- Command-line flags to specify:
-  - Custom gopher image
-  - Output filename
-  - QR size or error correction level
-- Optional colorized terminal QR
-- Optional web version via serverless API
-
----
-
-### License
-
-MIT License
