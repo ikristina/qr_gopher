@@ -53,10 +53,9 @@ Example output:
 
 ```
 QR code generated → output.png
-
 ```
 
-![outputQR]("output.png")
+![Generated QR code](output.png)
 
 ---
 
